@@ -31,8 +31,8 @@ const unsigned int EMPTY_SUM    =   216; // ascii value of an "empty" slot
 const unsigned int X_SUM        =   272 + 434 + 275; // ascii value of an slot filled by X (also red + reset)
 const unsigned int O_SUM        =   263 + 439 + 275; // ascii value of an slot filled by O (also cyan + reset)
 
-const string X_PLAYER           =   "X";
-const string O_PLAYER           =   "O";
+const string X_PLAYER           =   red + "X" + reset;
+const string O_PLAYER           =   cyan + "O" + reset;
 
 string board[][5] = {"   ", " 0 ", " 1 ", " 2 ", "(y)",
                      "0  ", "[ ]", "[ ]", "[ ]", "   ",
@@ -85,7 +85,7 @@ Action check_sum(int sum, string player) {
 }
 
 // checks the collindant slots in order to see if a player has won, is a valid movement or is not a valid movement
-Action get_result_from_action(unsigned short *x, unsigned short *y, string player) {
+Action get_action_from_movement(unsigned short *x, unsigned short *y, string player) {
     if (*x > 3 || *y > 3 || *x < 0 || *y < 0)
         return NO;
 
@@ -140,7 +140,7 @@ Action get_result_from_action(unsigned short *x, unsigned short *y, string playe
 
 // fills the given slot with the given player value
 void fill_slot(unsigned short *x, unsigned short *y, string player) {
-    board[*x][*y] = "[" + (player == X_PLAYER ? (red + X_PLAYER) : (cyan + O_PLAYER)) + reset + "]";
+    board[*x][*y] = "[" + player + "]";
 }
 
 // checks if the board is full
@@ -178,7 +178,7 @@ void handle_turn(string player) {
         x = x + 1;
         y = y + 1;
 
-        curr_state = get_result_from_action(&x, &y, player);
+        curr_state = get_action_from_movement(&x, &y, player);
 
         if (curr_state == NO) {
             error = true;
@@ -189,11 +189,8 @@ void handle_turn(string player) {
         fill_slot(&x, &y, player);
         print_board();
 
-        if (curr_state == X_WIN) {
-            cout << "Player [X] wins!" << endl;
-            exit_game();
-        } else if (curr_state == O_WIN) {
-            cout << "Player [O] wins!" << endl;
+        if (curr_state == X_WIN || curr_state == O_WIN) {
+            cout << "Player [" << player << "] wins!" << endl;
             exit_game();
         }
 
